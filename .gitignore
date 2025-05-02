@@ -1,0 +1,24 @@
+# منع مجلد node_modules
+node_modules/
+
+# منع ملفات الـ logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# منع ملفات الـ environment
+.env
+
+# منع ملفات نظام التشغيل
+.DS_Store
+Thumbs.db
+
+# منع مجلد التغطية من أدوات الاختبار
+coverage/
+
+# منع الملفات المؤقتة من المحررات
+.vscode/
+.idea/
+*.swp
