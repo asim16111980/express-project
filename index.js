@@ -11,11 +11,11 @@ const url =
 
 const main = async () => {
   await mongoose.connect(url);
-  console.log("Mserver started");
+  console.log("Mongo-db server started");
 };
 
 main();
 
 app.listen("3000", () => {
-  console.log("server is starting");
+  console.log("Listening on port: 3000");
 });

@@ -1,20 +1,24 @@
-import express from "express";
 import productModel from "../models/products.model.js";
 import { validationResult } from "express-validator";
+import httpStatusText from "./utils/httpStatusText.js";
 
 const getAllProducts = async (req, res) => {
   const products = await productModel.find();
-  res.json(products);
+  res.json({ status: httpStatusText.SUCCESS, data: { products } });
 };
 
 const getProduct = async (req, res) => {
   const productId = req.params.id;
   try {
     const product = await productModel.findById(productId);
-    if (!product) return res.status(404).json({ msg: "Product is not found" });
-    res.json(product);
+    if (!product)
+      return res.status(404).json({
+        status: httpStatusText.FAIL,
+        data: { product: null },
+      });
+    res.json({ status: httpStatusText.SUCCESS, data: { product } });
   } catch (error) {
-    res.status(500).json({ msg: "Server error" });
+    res.status(400).json({ status: httpStatusText.ERROR, msg: "Invalid ID format. Please provide a valid identifier." });
   }
 };
 
@@ -46,8 +50,8 @@ const updateProduct = async (req, res) => {
 
 const deleteProduct = async (req, res) => {
   const productId = req.params.id;
-   await productModel.deleteOne({_id:productId});
-  res.status(200).json({ success: true, msg: "Product deleted successfully" });
+  await productModel.deleteOne({ _id: productId });
+  res.status(200).json({ status: httpStatusText.SUCCESS, data: null });
 };
 
 export { getAllProducts, getProduct, addProduct, updateProduct, deleteProduct };
