@@ -1,13 +1,21 @@
 import express from "express";
 import mongoose from "mongoose";
 import productsRouter from "./routes/products.route.js";
+import "dotenv/config";
+import httpStatusText from "./utils/httpStatusText.js";
 
 const app = express();
 app.use(express.json());
 app.use("/api/products", productsRouter);
+app.all("*", (req, res) => {
+  return res.status(404).json({
+    status: httpStatusText.ERROR,
+    message: "This resource is not available",
+  });
+});
 
-const url =
-  "mongodb+srv://abomido1012014:me01098456961@learn-mongo-db.ygqwqya.mongodb.net/learning-mongo-db?retryWrites=true&w=majority&appName=learn-mongo-db";
+const url = process.env.MONGO_URL;
+const port = process.env.PORT || 3000;
 
 const main = async () => {
   await mongoose.connect(url);
@@ -16,6 +24,6 @@ const main = async () => {
 
 main();
 
-app.listen("3000", () => {
-  console.log("Listening on port: 3000");
+app.listen(port, () => {
+  console.log("Listening on port:", port);
 });
