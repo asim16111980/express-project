@@ -1,6 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import productsRouter from "./routes/products.route.js";
+import usersRouter from "./routes/users.route.js";
 import "dotenv/config";
 import httpStatusText from "./utils/httpStatusText.js";
 import cors from "cors";
@@ -15,7 +16,16 @@ app.all("*any-route", (req, res) => {
     message: "This resource is not available",
   });
 });
+app.use((err, req, res, next) => {
+  res.status(err.statusCode || 500).json({
+    status: err.statusText || httpStatusText.ERROR,
+    message: err.message,
+    code: err.statusCode || 500,
+    data: null,
+  });
+});
 
+app.use('/api/users',usersRouter)
 const url = process.env.MONGO_URL;
 const port = process.env.PORT || 3000;
 
