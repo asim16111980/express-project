@@ -1,4 +1,4 @@
-import productModel from "../models/product.model.js";
+import product from "../models/product.model.js";
 import { validationResult } from "express-validator";
 import httpStatusText from "../utils/httpStatusText.js";
 import asyncWrapper from "../middlewares/asyncWrapper.js";
@@ -10,7 +10,7 @@ const getAllProducts = asyncWrapper(async (req, res, next) => {
   const page = query.page || 1;
   const skip = (page - 1) * limit;
 
-  const products = await productModel
+  const products = await product
     .find({}, { __v: false })
     .limit(limit)
     .skip(skip);
@@ -19,7 +19,7 @@ const getAllProducts = asyncWrapper(async (req, res, next) => {
 
 const getProduct = asyncWrapper(async (req, res, next) => {
   const productId = req.params.id;
-  const product = await productModel.findById(productId);
+  const product = await product.findById(productId);
   if (!product) {
     const error = appError.create(
       `Product with ID ${productId} not found.`,
@@ -38,7 +38,7 @@ const addProduct = asyncWrapper(async (req, res, next) => {
     return next(error);
   }
 
-  const newProduct = new productModel(req.body);
+  const newProduct = new product(req.body);
   await newProduct.save();
   res
     .status(201)
@@ -48,7 +48,7 @@ const addProduct = asyncWrapper(async (req, res, next) => {
 const updateProduct = asyncWrapper(async (req, res, next) => {
   const productId = req.params.id;
 
-  const updatedProduct = await productModel.updateOne(
+  const updatedProduct = await product.updateOne(
     { _id: productId },
     {
       $set: { ...req.body },
@@ -62,7 +62,7 @@ const updateProduct = asyncWrapper(async (req, res, next) => {
 
 const deleteProduct = asyncWrapper(async (req, res, next) => {
   const productId = req.params.id;
-  await productModel.deleteOne({ _id: productId });
+  await product.deleteOne({ _id: productId });
   res.status(200).json({ status: httpStatusText.SUCCESS, data: null });
 });
 
