@@ -46,5 +46,37 @@ const register = asyncWrapper(async (req, res, next) => {
     .json({ status: httpStatusText.SUCCESS, data: { user: newUser } });
 });
 
-const login = () => {};
-export { getAllUsers };
+const login = asyncWrapper(async (req, res, next) => {
+  const { email, password } = req.body;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const error = appError.create(errors.array(), 400, httpStatusText.FAIL);
+    return next(error);
+  }
+
+  const foundUser = await userModel.findOne({ email: email });
+  if (!foundUser) {
+    const error = appError.create(
+      "Invalid email or password. Please try again.",
+      401,
+      httpStatusText.FAIL
+    );
+    return next(error);
+  }
+
+  const isPasswordValid = await bcrypt.compare(password, foundUser.password);
+  if (!isPasswordValid) {
+    const error = appError.create(
+      "Invalid email or password. Please try again.",
+      401,
+      httpStatusText.FAIL
+    );
+    return next(error);
+  }
+
+  res
+    .status(200)
+    .json({ status: httpStatusText.SUCCESS, data: { user: foundUser } });
+});
+
+export { getAllUsers, register, login };
