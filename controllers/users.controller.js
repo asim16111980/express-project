@@ -11,7 +11,7 @@ const getAllUsers = asyncWrapper(async (req, res, next) => {
   const page = query.page || 1;
   const skip = (page - 1) * limit;
 
-  const users = await userModel
+  const users = await user
     .find({}, { __v: false, password: false })
     .limit(limit)
     .skip(skip);
@@ -21,7 +21,7 @@ const getAllUsers = asyncWrapper(async (req, res, next) => {
 const register = asyncWrapper(async (req, res, next) => {
   const { firstName, lastName, email, password } = req.body;
 
-  const foundUser = await userModel.findOne({
+  const foundUser = await user.findOne({
     email: email,
   });
   if (foundUser) {
@@ -54,11 +54,11 @@ const login = asyncWrapper(async (req, res, next) => {
     return next(error);
   }
 
-  const foundUser = await userModel.findOne({ email: email });
+  const foundUser = await user.findOne({ email: email });
   if (!foundUser) {
     const error = appError.create(
-      "Invalid email or password. Please try again.",
-      401,
+      "User not found. Please make sure the email is correct or register first.",
+      404,
       httpStatusText.FAIL
     );
     return next(error);
@@ -67,7 +67,7 @@ const login = asyncWrapper(async (req, res, next) => {
   const isPasswordValid = await bcrypt.compare(password, foundUser.password);
   if (!isPasswordValid) {
     const error = appError.create(
-      "Invalid email or password. Please try again.",
+      "Incorrect password. Please try again.",
       401,
       httpStatusText.FAIL
     );
