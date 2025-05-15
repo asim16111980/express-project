@@ -4,6 +4,7 @@ import httpStatusText from "../utils/httpStatusText.js";
 import asyncWrapper from "../middlewares/asyncWrapper.js";
 import appError from "../utils/appError.js";
 import { bcrypt } from "bcryptjs";
+import generateJWT from "../utils/generateJWT.js";
 
 const getAllUsers = asyncWrapper(async (req, res, next) => {
   const query = req.query;
@@ -40,6 +41,10 @@ const register = asyncWrapper(async (req, res, next) => {
     email,
     password: hashedPassword,
   });
+
+  const token = generateJWT({ email: newUser.email, id: newUser._id }, "1m");
+
+  newUser.token = token;
   await newUser.save();
   res
     .status(201)
@@ -74,9 +79,11 @@ const login = asyncWrapper(async (req, res, next) => {
     return next(error);
   }
 
+  const token = generateJWT({ email: user.email, id: user._id }, "1m");
+
   res
     .status(200)
-    .json({ status: httpStatusText.SUCCESS, data: { user: foundUser } });
+    .json({ status: httpStatusText.SUCCESS, data: { token: token } });
 });
 
 export { getAllUsers, register, login };

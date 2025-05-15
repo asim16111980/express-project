@@ -14,12 +14,16 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    valdite:[validator.isEmail,"Invalid email address. Please enter a valid email."]
+    valdite: [
+      validator.isEmail,
+      "Invalid email address. Please enter a valid email.",
+    ],
   },
   password: {
     type: String,
     required: true,
   },
+  token: { type: String },
 });
 
 const userModel = mongoose.model("User", userSchema);
