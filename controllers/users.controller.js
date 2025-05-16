@@ -1,9 +1,9 @@
-import user from "../models/user.model.js";
+import User from "../models/user.model.js";
 import { validationResult } from "express-validator";
 import httpStatusText from "../utils/httpStatusText.js";
 import asyncWrapper from "../middlewares/asyncWrapper.js";
 import appError from "../utils/appError.js";
-import { bcrypt } from "bcryptjs";
+import bcrypt from "bcryptjs";
 import generateJWT from "../utils/generateJWT.js";
 
 const getAllUsers = asyncWrapper(async (req, res, next) => {
@@ -12,8 +12,7 @@ const getAllUsers = asyncWrapper(async (req, res, next) => {
   const page = query.page || 1;
   const skip = (page - 1) * limit;
 
-  const users = await user
-    .find({}, { __v: false, password: false })
+  const users = await User.find({}, { __v: false, password: false })
     .limit(limit)
     .skip(skip);
   res.json({ status: httpStatusText.SUCCESS, data: { users } });
@@ -21,10 +20,10 @@ const getAllUsers = asyncWrapper(async (req, res, next) => {
 
 const register = asyncWrapper(async (req, res, next) => {
   const { firstName, lastName, email, password } = req.body;
-
-  const foundUser = await user.findOne({
+  const foundUser = await User.findOne({
     email: email,
   });
+
   if (foundUser) {
     const error = appError.create(
       "This email is already registered. Please use a different email or log in instead.",
@@ -33,9 +32,9 @@ const register = asyncWrapper(async (req, res, next) => {
     );
     return next(error);
   }
-
-  const hashedPassword = await bcrypt.hash(password);
-  const newUser = new user({
+ 
+  const hashedPassword =await bcrypt.hash(password,10);
+  const newUser = new User({
     firstName,
     lastName,
     email,
@@ -59,7 +58,7 @@ const login = asyncWrapper(async (req, res, next) => {
     return next(error);
   }
 
-  const foundUser = await user.findOne({ email: email });
+  const foundUser = await User.findOne({ email: email });
   if (!foundUser) {
     const error = appError.create(
       "User not found. Please make sure the email is correct or register first.",
@@ -79,7 +78,10 @@ const login = asyncWrapper(async (req, res, next) => {
     return next(error);
   }
 
-  const token = generateJWT({ email: user.email, id: user._id }, "1m");
+  const token = generateJWT(
+    { email: foundUser.email, id: foundUser._id },
+    "1m"
+  );
 
   res
     .status(200)

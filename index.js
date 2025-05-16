@@ -10,6 +10,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use("/api/products", productsRouter);
+app.use('/api/users',usersRouter)
 app.all("*any-route", (req, res) => {
   return res.status(404).json({
     status: httpStatusText.ERROR,
@@ -25,7 +26,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.use('/api/users',usersRouter)
 const url = process.env.MONGO_URL;
 const port = process.env.PORT || 3000;
 
