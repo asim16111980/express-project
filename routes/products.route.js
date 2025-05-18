@@ -1,6 +1,7 @@
 import express from "express";
 import * as productsController from "../controllers/products.controller.js";
 import { productValidation } from "../middlewares/validationSchema.js";
+import verifyToken from "../middlewares/verifyToken.js";
 
 const router = express.Router();
 
@@ -11,7 +12,7 @@ router
 
 router
   .route("/:id")
-  .get(productsController.getProduct)
+  .get(verifyToken,productsController.getProduct)
   .patch(productsController.updateProduct)
   .delete(productsController.deleteProduct);
 
