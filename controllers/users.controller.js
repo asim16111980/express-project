@@ -19,7 +19,7 @@ const getAllUsers = asyncWrapper(async (req, res, next) => {
 });
 
 const register = asyncWrapper(async (req, res, next) => {
-  const { firstName, lastName, email, password } = req.body;
+  const { firstName, lastName, email, password, role } = req.body;
   const foundUser = await User.findOne({
     email: email,
   });
@@ -32,16 +32,20 @@ const register = asyncWrapper(async (req, res, next) => {
     );
     return next(error);
   }
- 
-  const hashedPassword =await bcrypt.hash(password,10);
+
+  const hashedPassword = await bcrypt.hash(password, 10);
   const newUser = new User({
     firstName,
     lastName,
     email,
     password: hashedPassword,
+    role,
   });
 
-  const token = generateJWT({ email: newUser.email, id: newUser._id }, "1m");
+  const token = generateJWT(
+    { email: newUser.email, id: newUser._id, role: newUser.role },
+    "1m"
+  );
 
   newUser.token = token;
   await newUser.save();
@@ -79,7 +83,7 @@ const login = asyncWrapper(async (req, res, next) => {
   }
 
   const token = generateJWT(
-    { email: foundUser.email, id: foundUser._id },
+    { email: foundUser.email, id: foundUser._id, role: foundUser.role },
     "1m"
   );
 

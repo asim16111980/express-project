@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import validator from "validator";
+import userRoles from "../utils/userRoles.js";
 
 const userSchema = new mongoose.Schema({
   firstName: {
@@ -14,7 +15,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    valdite: [
+    validate: [
       validator.isEmail,
       "Invalid email address. Please enter a valid email.",
     ],
@@ -24,6 +25,11 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   token: { type: String },
+  role: {
+    type: String,
+    enum: [userRoles.ADMIN, userRoles.MANAGER, userRoles.USER],
+    default: userRoles.USER,
+  },
 });
 
 const userModel = mongoose.model("User", userSchema);
