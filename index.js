@@ -5,12 +5,14 @@ import usersRouter from "./routes/users.route.js";
 import "dotenv/config";
 import httpStatusText from "./utils/httpStatusText.js";
 import cors from "cors";
+import path from "node:path";
 
 const app = express();
+// app.use("/uploads", express.static(path.join(import.meta.dirname, "/uploads")));
 app.use(cors());
 app.use(express.json());
 app.use("/api/products", productsRouter);
-app.use('/api/users',usersRouter)
+app.use("/api/users", usersRouter);
 app.all("*any-route", (req, res) => {
   return res.status(404).json({
     status: httpStatusText.ERROR,
